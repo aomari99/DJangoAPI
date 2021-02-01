@@ -27,7 +27,7 @@ SECRET_KEY = '%r#2_=88w9z_tty6^!hfcvq6o(uc)&55(3ef!m-2$iisyq^hgc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.178.31"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -88,11 +88,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES =  {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'MocoDB2', #Databsename  
-        'USER': 'MocoAdmin',
-        'PASSWORD': 'MocoDBPassword',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'NAME': 'postgres', #Databsename  
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
