@@ -119,9 +119,9 @@ class UserGetSerializer(serializers.Serializer):
         Check that the blog post is about USer.
         """
          
-        print(self)
+        #print(self)
         x = self.initial_data
-        print(x)
+        #print(x)
         if (User.objects.filter(email = data['email'] ,password = hashpw(data['password'])).exists() == False ):
             raise serializers.ValidationError("Wrong Email or Password")
         return data
