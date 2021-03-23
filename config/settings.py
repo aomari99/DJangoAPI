@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '%r#2_=88w9z_tty6^!hfcvq6o(uc)&55(3ef!m-2$iisyq^hgc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_gis',
+    'rest_framework_swagger',
     'pages.apps.PagesConfig',
     'api.apps.ApiConfig',
      'phonenumber_field',
@@ -142,3 +143,13 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT ,'static')
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(STATIC_ROOT,'media') 
 MEDIA_URL = '/media/'
+
+
+
+
+
+
+
+
+
+ 

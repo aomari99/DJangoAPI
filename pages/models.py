@@ -63,16 +63,52 @@ def user_directory_path(instance, filename):
                 os.remove(files)
     return filenameout
 
+def rechnung_hf_directory_path(instance, filename):  
+    filenameout = 'images/hf_rechnung_{0}_{1}'.format(instance.id, filename)
+    # file will be uploaded to MEDIA_ROOT / user_<id>/<filename> 
+    print(filenameout)
+    #os.chdir("")
+    userimgs = glob.glob(settings.MEDIA_ROOT+"/images/hf_rechnung_"+str(instance.id)+"*")
+    for files in userimgs:
+            print(files)
+            if (files !=filenameout ):
+                os.remove(files)
+    return filenameout
+
+def rechnung_hfs_directory_path(instance, filename):  
+    filenameout = 'images/hfs_rechnung_{0}_{1}'.format(instance.id, filename)
+    # file will be uploaded to MEDIA_ROOT / user_<id>/<filename> 
+    print(filenameout)
+    #os.chdir("")
+    userimgs = glob.glob(settings.MEDIA_ROOT+"/images/hfs_rechnung_"+str(instance.id)+"*")
+    for files in userimgs:
+            print(files)
+            if (files !=filenameout ):
+                os.remove(files)
+    return filenameout
+
+def pay_directory_path(instance, filename):  
+    filenameout = 'images/pay_{0}_{1}'.format(instance.id, filename)
+    # file will be uploaded to MEDIA_ROOT / user_<id>/<filename> 
+    print(filenameout)
+    #os.chdir("")
+    userimgs = glob.glob(settings.MEDIA_ROOT+"/images/pay_"+str(instance.id)+"*")
+    for files in userimgs:
+            print(files)
+            if (files !=filenameout ):
+                os.remove(files)
+    return filenameout
  
 # creating a validator function 
 #  #profile_pic = models.ImageField(default='images/user_default.png') #,upload_to = user_directory_path ) 
 class User(models.Model):
     name = models.CharField(max_length=250)
-    firstname= models.CharField(max_length=250)
+    firstname = models.CharField(max_length=250)
+    firebase_token = models.CharField(max_length=250,default="")
     plz = models.CharField(max_length=250)
     City = models.CharField(max_length=250)
     Street = models.CharField(max_length=250)
-    location = models.PointField(srid=4326,geography=True, default=Point(0.0, 0.0)) 
+    location = models.PointField(srid=4326,geography=True, default=Point(51.133481, 10.018343)) 
     session_id = models.CharField( max_length=250 ,unique = True)
     phone_number = PhoneNumberField(help_text='Contact phone number',unique=True)
     is_active = models.BooleanField(default=False)
@@ -93,7 +129,9 @@ class User(models.Model):
     )
     password = models.CharField( max_length=200)
     email = models.EmailField(unique=True)
-    
+    @property
+    def _sessionid(self):
+        return self.session_id
     def __str__(self):
         return self.firstname + " " + self.name
 class Item(models.Model):
@@ -101,25 +139,46 @@ class Item(models.Model):
     cost = models.DecimalField(max_digits=6, decimal_places=2)
     def __str__(self):
         return self.name 
+class Article(models.Model):
+    item = models.ForeignKey(Item , on_delete = models.CASCADE)
+    count =   models.IntegerField(
+        default=0,
+        validators=[MaxValueValidator(5), MinValueValidator(0)]
+     )
+    def __str__(self):
+        return str(self.item) +" "+ str(self.count)
 class BuyList(models.Model):
-    items= models.ManyToManyField(Item) 
+    articles = models.ManyToManyField(Article) 
     helpsearcher = models.ForeignKey(User,limit_choices_to={'usertype': 'HFS'}, on_delete = models.CASCADE)
     creation_date =  models.DateTimeField(
     auto_now_add=True)
     def __str__(self):
         return "ID: " + str(self.id) + " "+ self.helpsearcher.name #+ " " + self.creation_date.strftime("%Y-%m-%d %H:%M") 
 class Shop(models.Model):
-    helper =models.ForeignKey(User,limit_choices_to={'usertype': 'HF'}, on_delete = models.CASCADE ,related_name='helper_requests_created') 
+    helper =models.ForeignKey(User,limit_choices_to={'usertype': 'HF'}, on_delete = models.CASCADE  ,null=True) 
     helpsearcher = models.ForeignKey(User,limit_choices_to={'usertype': 'HFS'}, on_delete = models.CASCADE ,related_name='helpseacher_requests_created') 
-    buylist = models.OneToOneField(BuyList,  
-          on_delete = models.CASCADE) 
+    buylist = models.ForeignKey(BuyList,   
+          on_delete = models.CASCADE)
+    bill_hfs = models.ImageField(null=True ,upload_to = rechnung_hfs_directory_path ) 
+    bill_hf = models.ImageField(null=True ,upload_to = rechnung_hf_directory_path ) 
+    payed_prove = models.ImageField(null=True ,upload_to = pay_directory_path ) 
     payed = models.BooleanField(default=False)
     done =models.BooleanField(default=False)
-    raiting =  models.IntegerField(
+    creation_date =  models.DateTimeField(
+    auto_now_add=True  )
+    raiting  =  models.IntegerField(
         default=0,
         validators=[MaxValueValidator(5), MinValueValidator(0)]
      )
     finished_date =  models.DateTimeField(null=True)
     def __str__(self):
-        return  "ID: " + str(self.id) + " "+ self.helpsearcher.firstname + " " +  self.helpsearcher.name +  " " + self.helper.firstname    + " "  + self.helper.name  + " " + (self.finished_date.strftime('%m/%d/%Y') if (self.finished_date is not None) else "")
+        return  "ID: " + str(self.id)  
 
+class Angebot(models.Model):
+    shop = models.ForeignKey(Shop,limit_choices_to={'helper__isnull': 'True'}, on_delete = models.CASCADE)
+    helper = models.ForeignKey(User,limit_choices_to={'usertype': 'HF'}, on_delete = models.CASCADE) 
+    approve = models.BooleanField(default=False)
+    viewed = models.BooleanField(default=False)
+    creation_date =  models.DateTimeField(
+    auto_now_add=True  )
+    
