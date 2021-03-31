@@ -10,6 +10,7 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance
 import logging
 from django.db.models import Q
+from rest_framework.response import Response
 class UserAdd(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserPostSerializer
@@ -106,7 +107,7 @@ class HelplUser(generics.ListAPIView):
         queryset = User.objects.filter(usertype ='HF',public=False ,location__distance_lte=(point,Distance(km=radius)))
         return queryset
     
-         
+   
 
 class HelpSearchUser(generics.ListAPIView):
   
@@ -131,9 +132,10 @@ class HelpSearchUser(generics.ListAPIView):
             return data
         raise serializers.ValidationError("Invalid Sessionid")
 
-class AddArticle(generics.CreateAPIView):
+class AddArticle(generics.ListCreateAPIView):
         queryset = Article.objects.all()
-        serializer_class = ArticleSerializerADD  
+        serializer_class = ArticleSerializerADDList  
+        
 
 class SearchHFS(generics.ListAPIView):
     lookup_fields = ['session_id']
@@ -302,8 +304,7 @@ class ShopGetOne(generics.RetrieveAPIView):
             return obj 
         raise serializers.ValidationError("Invalid Sessionid")
 
-class BuyListAdd(generics.CreateAPIView):
-    
+class BuyListAdd(generics.CreateAPIView):  
     queryset = BuyList.objects.all()
     serializer_class = BuyListSerializer
 class ShopAdd(generics.CreateAPIView):

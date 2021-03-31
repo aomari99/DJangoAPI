@@ -171,6 +171,7 @@ class Shop(models.Model):
         validators=[MaxValueValidator(5), MinValueValidator(0)]
      )
     finished_date =  models.DateTimeField(null=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2,default=0.0)
     def __str__(self):
         return  "ID: " + str(self.id)  
 
